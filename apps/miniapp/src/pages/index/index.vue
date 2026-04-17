@@ -1,7 +1,7 @@
 <template>
   <view class="content">
     <image class="logo" src="/static/logo.png" />
-    <view class="text-area">
+    <view class="text-area">sfksfsk sdf 
       <text class="title">{{ title }}</text>
     </view>
   </view>

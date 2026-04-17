@@ -4,7 +4,7 @@
 - 快速交付可上线功能：小步提交、每步可运行、可回滚。
 - 严格最小化开发：只做需求范围内改动，禁止无关重构/优化。
 - 后端严格遵循《阿里巴巴Java开发规范》。
-
+- 完善注释：类、字段、方法、数据表均需添加注释并维护
 ## 仓库模块
 - apps/miniapp：uni-app 小程序（TS/JS + Vue）
 - apps/admin-web：后台管理（Vue + TS/JS）
@@ -19,6 +19,7 @@
 - 安装：cd apps/miniapp && npm install
 - 开发编译：cd apps/miniapp && npm run dev:mp-weixin
 - 生产构建：cd apps/miniapp npm run build:mp-weixin
+- 高危依赖审计：cd apps/miniapp && npm run test:audit
 
 ### 后台Web（Vue）
 - 安装：cd apps/admin-web && npm install
@@ -59,3 +60,4 @@
 ## 验收与回归（必须可勾选）
 - 每个 feature spec 必须有验收清单（Given/When/Then 或 checklist）。
 - 发布前必须跑最小回归：小程序主流程、后台核心页面、后端健康检查与关键接口。
+- 发布前必须通过高危依赖审计：cd apps/miniapp && npm run test:audit
