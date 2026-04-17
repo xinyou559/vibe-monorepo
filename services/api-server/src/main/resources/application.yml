@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: api-server
+
+  # DataSource Config
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/beauty_platform}
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:2559}
+    driver-class-name: org.postgresql.Driver
+
+  # Initialize database schema automatically
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+
+# MyBatis Config
+mybatis:
+  mapper-locations: classpath*:mapper/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
