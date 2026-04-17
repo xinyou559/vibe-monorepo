@@ -63,3 +63,4 @@
 - 发布前必须通过高危依赖审计：cd apps/miniapp && npm run test:audit
 - **避免跨端联调 CORS 报错**：本地前端联调时，Admin 使用 Vite proxy（vite.config.ts），Miniapp (H5) 需要后端配置全局 CORS（WebMvcConfig.java）。
 - **降低 MVP 本地环境差异**：优先使用 H2 内存数据库保证随时跑通（通过 spring.sql.init 自动刷入建表和测试数据），避免 PostgreSQL 本地账号配置带来的依赖报错。
+- **Web/前端项目交付红线**：开发或修改完成后，绝不能仅凭“代码写完”就交付。必须执行 `npm run dev`，并使用 `OpenPreview`（或真实浏览器）查看渲染效果，验证是否存在打包或运行时报错。
