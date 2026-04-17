@@ -40,3 +40,8 @@ CREATE TABLE IF NOT EXISTS transactions (
     related_id INT,                                  -- 关联业务ID（如对应的 order_id）
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- H2 兼容插入测试数据（可选，为了让前端起来有数据）
+INSERT INTO service_items (name, description, price, commission_rate, status) VALUES 
+('精油开背', '深层放松，缓解疲劳', 198.00, 0.10, 'ACTIVE'),
+('面部补水', '深层清洁，补水保湿', 298.00, 0.15, 'ACTIVE');
