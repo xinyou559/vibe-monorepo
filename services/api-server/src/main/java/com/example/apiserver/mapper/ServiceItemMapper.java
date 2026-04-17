@@ -14,6 +14,9 @@ public interface ServiceItemMapper {
     @Select("SELECT * FROM service_items WHERE status = #{status}")
     List<ServiceItem> findByStatus(@Param("status") String status);
 
+    @Select("SELECT * FROM service_items ORDER BY created_at DESC")
+    List<ServiceItem> findAll();
+
     int insert(ServiceItem serviceItem);
     
     int update(ServiceItem serviceItem);

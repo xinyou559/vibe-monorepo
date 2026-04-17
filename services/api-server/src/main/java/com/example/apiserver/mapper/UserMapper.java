@@ -16,4 +16,7 @@ public interface UserMapper {
     int insert(User user);
     
     int updateBalance(@Param("id") Integer id, @Param("amount") java.math.BigDecimal amount);
+    
+    @Select("SELECT * FROM users ORDER BY created_at DESC")
+    java.util.List<User> findAll();
 }

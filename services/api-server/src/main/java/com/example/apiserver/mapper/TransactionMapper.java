@@ -14,5 +14,8 @@ public interface TransactionMapper {
     @Select("SELECT * FROM transactions WHERE user_id = #{userId} ORDER BY created_at DESC")
     List<Transaction> findByUserId(@Param("userId") Integer userId);
 
+    @Select("SELECT * FROM transactions ORDER BY created_at DESC")
+    List<Transaction> findAll();
+
     int insert(Transaction transaction);
 }
