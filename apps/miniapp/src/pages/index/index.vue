@@ -1,21 +1,25 @@
 <template>
-  <view class="container">
-    <view class="header">
-      <text class="title">推荐美业服务</text>
+  <view class="page">
+    <view class="hero">
+      <text class="title-xl">今日可约服务</text>
+      <text class="title-sm">余额支付 · 分享返佣 · 订单可查</text>
     </view>
-    
-    <view class="service-list">
-      <view class="service-item" v-for="item in services" :key="item.id">
-        <view class="info">
+
+    <view class="surface list">
+      <view class="item" v-for="item in services" :key="item.id">
+        <view class="left">
           <text class="name">{{ item.name }}</text>
           <text class="desc">{{ item.description || '暂无描述' }}</text>
-          <text class="price">¥ {{ item.price }}</text>
         </view>
-        <button class="buy-btn" @click="buyService(item.id)">立即购买</button>
+        <view class="right">
+          <text class="price mono">¥{{ Number(item.price).toFixed(2) }}</text>
+          <button class="btn btn-primary" @click="buyService(item.id)">购买</button>
+        </view>
       </view>
-      
+
       <view class="empty" v-if="services.length === 0">
-        <text>暂无服务上架</text>
+        <text class="empty-title">暂无服务上架</text>
+        <text class="empty-sub">请先在后台创建并上架服务项目</text>
       </view>
     </view>
   </view>
@@ -77,15 +81,84 @@ onLoad((options) => {
 </script>
 
 <style>
-.container { padding: 20rpx; background: #f5f7fa; min-height: 100vh; }
-.header { padding: 20rpx 0; }
-.title { font-size: 36rpx; font-weight: bold; color: #333; }
-.service-list { margin-top: 20rpx; }
-.service-item { background: #fff; padding: 30rpx; border-radius: 12rpx; margin-bottom: 20rpx; display: flex; justify-content: space-between; align-items: center; }
-.info { display: flex; flex-direction: column; flex: 1; }
-.name { font-size: 32rpx; color: #333; font-weight: 500; margin-bottom: 10rpx; }
-.desc { font-size: 24rpx; color: #999; margin-bottom: 15rpx; }
-.price { font-size: 36rpx; color: #e43d33; font-weight: bold; }
-.buy-btn { margin: 0; padding: 0 30rpx; height: 60rpx; line-height: 60rpx; font-size: 26rpx; background: #409eff; color: #fff; border-radius: 30rpx; }
-.empty { text-align: center; padding: 50rpx; color: #999; font-size: 28rpx; }
+.hero {
+  padding: 24rpx 0 28rpx;
+}
+
+.list {
+  overflow: hidden;
+}
+
+.item {
+  padding: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.item:last-child {
+  border-bottom: none;
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+  min-width: 0;
+  padding-right: 16rpx;
+}
+
+.name {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.desc {
+  font-size: 26rpx;
+  color: var(--muted);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 14rpx;
+  flex-shrink: 0;
+}
+
+.price {
+  font-size: 32rpx;
+  font-weight: 800;
+}
+
+.btn {
+  min-width: 160rpx;
+}
+
+.empty {
+  padding: 100rpx 32rpx;
+  text-align: center;
+}
+
+.empty-title {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 10rpx;
+}
+
+.empty-sub {
+  display: block;
+  font-size: 24rpx;
+  color: var(--muted);
+}
 </style>

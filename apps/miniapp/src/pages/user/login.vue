@@ -1,21 +1,30 @@
 <template>
-  <view class="container">
-    <view class="title">登录/注册</view>
-    <view class="form">
-      <view class="input-item">
+  <view class="page">
+    <view class="hero">
+      <text class="title-xl">登录 / 注册</text>
+      <text class="title-sm">MVP 模拟登录，用于快速跑通链路</text>
+    </view>
+
+    <view class="surface form">
+      <view class="field">
         <text class="label">模拟 OpenID</text>
-        <input class="input" v-model="openid" placeholder="输入任意唯一字符串如 user123" />
-      </view>
-      <view class="input-item">
-        <text class="label">手机号(选填)</text>
-        <input class="input" v-model="phone" placeholder="输入手机号" />
-      </view>
-      <view class="input-item" v-if="referrerId">
-        <text class="label">绑定推荐人</text>
-        <text class="input disabled">ID: {{ referrerId }} (不可修改)</text>
+        <input class="input" v-model="openid" placeholder="例如：user_001" />
       </view>
 
-      <button class="login-btn" @click="handleLogin">确认登录</button>
+      <view class="field">
+        <text class="label">手机号（选填）</text>
+        <input class="input" v-model="phone" placeholder="例如：13800000000" />
+      </view>
+
+      <view class="field" v-if="referrerId">
+        <text class="label">绑定推荐人</text>
+        <view class="chip">
+          <text class="mono">UID #{{ String(referrerId).padStart(4, '0') }}</text>
+          <text class="muted">（不可修改）</text>
+        </view>
+      </view>
+
+      <button class="btn btn-primary full" @click="handleLogin">继续</button>
     </view>
   </view>
 </template>
@@ -63,12 +72,54 @@ onLoad(() => {
 </script>
 
 <style>
-.container { padding: 40rpx; background: #fff; min-height: 100vh; }
-.title { font-size: 48rpx; font-weight: bold; margin-bottom: 60rpx; color: #333; }
-.form { display: flex; flex-direction: column; }
-.input-item { margin-bottom: 40rpx; }
-.label { font-size: 28rpx; color: #666; margin-bottom: 10rpx; display: block; }
-.input { border-bottom: 1px solid #eee; padding: 20rpx 0; font-size: 32rpx; }
-.disabled { color: #999; }
-.login-btn { background: #409eff; color: #fff; border-radius: 8rpx; margin-top: 40rpx; height: 88rpx; line-height: 88rpx; font-size: 32rpx; width: 100%; }
+.hero {
+  padding: 24rpx 0 28rpx;
+}
+
+.form {
+  padding: 28rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 22rpx;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+.label {
+  font-size: 24rpx;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.input {
+  padding: 20rpx 18rpx;
+  border: 1px solid var(--hairline);
+  border-radius: 14rpx;
+  background: #ffffff;
+  font-size: 30rpx;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  padding: 18rpx 16rpx;
+  border: 1px solid var(--hairline);
+  border-radius: 14rpx;
+  background: rgba(17, 17, 17, 0.02);
+}
+
+.muted {
+  font-size: 24rpx;
+  color: var(--muted);
+}
+
+.full {
+  width: 100%;
+  margin-top: 8rpx;
+}
 </style>

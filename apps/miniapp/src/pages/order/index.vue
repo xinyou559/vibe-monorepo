@@ -1,26 +1,29 @@
 <template>
-  <view class="container">
-    <view class="header">
-      <text class="title">我的订单</text>
+  <view class="page">
+    <view class="hero">
+      <text class="title-xl">我的订单</text>
+      <text class="title-sm">已购买服务 · 状态可追踪</text>
     </view>
-    
-    <view class="order-list">
+
+    <view class="surface list">
       <view class="order-item" v-for="item in orders" :key="item.id">
-        <view class="top">
-          <text class="order-no">订单号: {{ item.id }}</text>
-          <text :class="['status', item.status.toLowerCase()]">{{ formatStatus(item.status) }}</text>
+        <view class="row top">
+          <text class="oid mono">#{{ String(item.id).padStart(6, '0') }}</text>
+          <view class="badge" :class="item.status.toLowerCase()">
+            <text class="dot"></text>
+            <text class="label">{{ formatStatus(item.status) }}</text>
+          </view>
         </view>
-        <view class="middle">
-          <text class="service-id">服务ID: {{ item.serviceId }}</text>
-          <text class="price">¥{{ item.amount }}</text>
+        <view class="row mid">
+          <text class="service">服务 ID {{ item.serviceId }}</text>
+          <text class="amount mono">¥{{ Number(item.amount).toFixed(2) }}</text>
         </view>
-        <view class="bottom">
-          <text class="time">{{ new Date(item.createdAt).toLocaleString() }}</text>
-        </view>
+        <view class="time">{{ new Date(item.createdAt).toLocaleString() }}</view>
       </view>
-      
+
       <view class="empty" v-if="orders.length === 0">
-        <text>暂无订单记录</text>
+        <text class="empty-title">暂无订单记录</text>
+        <text class="empty-sub">购买成功后会显示在这里</text>
       </view>
     </view>
   </view>
@@ -71,22 +74,117 @@ onShow(() => {
 </script>
 
 <style>
-.container { padding: 20rpx; background: #f5f7fa; min-height: 100vh; }
-.header { padding: 20rpx 0; }
-.title { font-size: 36rpx; font-weight: bold; color: #333; }
-.order-list { margin-top: 20rpx; }
-.order-item { background: #fff; padding: 30rpx; border-radius: 12rpx; margin-bottom: 20rpx; display: flex; flex-direction: column; }
-.top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20rpx; border-bottom: 1px solid #f5f5f5; padding-bottom: 20rpx; }
-.order-no { font-size: 28rpx; color: #666; }
-.status { font-size: 28rpx; font-weight: bold; }
-.status.init { color: #909399; }
-.status.paid { color: #e6a23c; }
-.status.completed { color: #67c23a; }
-.status.cancelled { color: #f56c6c; }
-.middle { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20rpx; }
-.service-id { font-size: 32rpx; color: #333; font-weight: 500; }
-.price { font-size: 36rpx; color: #e43d33; font-weight: bold; }
-.bottom { text-align: right; }
-.time { font-size: 24rpx; color: #999; }
-.empty { text-align: center; padding: 50rpx; color: #999; font-size: 28rpx; }
+.hero {
+  padding: 24rpx 0 28rpx;
+}
+
+.list {
+  overflow: hidden;
+}
+
+.order-item {
+  padding: 26rpx 28rpx;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.order-item:last-child {
+  border-bottom: none;
+}
+
+.top {
+  margin-bottom: 16rpx;
+}
+
+.oid {
+  font-size: 26rpx;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10rpx;
+  padding: 8rpx 14rpx;
+  border-radius: 999rpx;
+  border: 1px solid var(--hairline);
+  background: rgba(17, 17, 17, 0.02);
+}
+
+.badge .dot {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 999rpx;
+  background: var(--muted);
+}
+
+.badge .label {
+  font-size: 24rpx;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.badge.paid {
+  background: rgba(230, 162, 60, 0.08);
+  border-color: rgba(230, 162, 60, 0.18);
+}
+.badge.paid .dot {
+  background: #e6a23c;
+}
+
+.badge.completed {
+  background: rgba(0, 200, 83, 0.08);
+  border-color: rgba(0, 200, 83, 0.18);
+}
+.badge.completed .dot {
+  background: #00c853;
+}
+
+.badge.cancelled {
+  background: rgba(228, 61, 51, 0.08);
+  border-color: rgba(228, 61, 51, 0.18);
+}
+.badge.cancelled .dot {
+  background: var(--danger);
+}
+
+.mid {
+  margin-bottom: 12rpx;
+}
+
+.service {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.amount {
+  font-size: 30rpx;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.time {
+  font-size: 22rpx;
+  color: var(--muted);
+}
+
+.empty {
+  padding: 100rpx 32rpx;
+  text-align: center;
+}
+
+.empty-title {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 10rpx;
+}
+
+.empty-sub {
+  display: block;
+  font-size: 24rpx;
+  color: var(--muted);
+}
 </style>

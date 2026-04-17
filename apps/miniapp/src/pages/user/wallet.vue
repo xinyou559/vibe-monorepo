@@ -1,24 +1,35 @@
 <template>
-  <view class="container">
-    <view class="wallet-card">
-      <text class="title">当前余额(元)</text>
-      <text class="balance">{{ userBalance }}</text>
-      <button class="recharge-btn" @click="handleRecharge">去充值</button>
+  <view class="page">
+    <view class="surface wallet-hero">
+      <view class="row">
+        <view class="col">
+          <text class="title-sm">当前余额</text>
+          <text class="balance mono">¥{{ Number(userBalance).toFixed(2) }}</text>
+        </view>
+        <button class="btn btn-primary" @click="handleRecharge">充值</button>
+      </view>
+      <view class="hint">充值 / 消费 / 提成收入均会记录到流水</view>
     </view>
 
-    <view class="section-title">资金明细</view>
-    <view class="tx-list">
-      <view class="tx-item" v-for="item in transactions" :key="item.id">
-        <view class="left">
-          <text class="type">{{ formatType(item.type) }}</text>
-          <text class="time">{{ new Date(item.createdAt).toLocaleString() }}</text>
-        </view>
-        <view :class="['right', item.amount > 0 ? 'plus' : 'minus']">
-          {{ item.amount > 0 ? '+' : '' }}{{ item.amount }}
-        </view>
+    <view class="section">
+      <view class="row section-head">
+        <text class="section-title">资金流水</text>
+        <text class="section-sub">{{ transactions.length }} 条</text>
       </view>
-      <view class="empty" v-if="transactions.length === 0">
-        <text>暂无资金流水</text>
+      <view class="surface list">
+        <view class="tx-item" v-for="item in transactions" :key="item.id">
+          <view class="left">
+            <text class="type">{{ formatType(item.type) }}</text>
+            <text class="time">{{ new Date(item.createdAt).toLocaleString() }}</text>
+          </view>
+          <view class="amount mono" :class="item.amount > 0 ? 'plus' : 'minus'">
+            {{ item.amount > 0 ? '+' : '' }}{{ Number(item.amount).toFixed(2) }}
+          </view>
+        </view>
+        <view class="empty" v-if="transactions.length === 0">
+          <text class="empty-title">暂无资金流水</text>
+          <text class="empty-sub">完成一次充值或购买后会显示在这里</text>
+        </view>
       </view>
     </view>
   </view>
@@ -99,19 +110,113 @@ onShow(() => {
 </script>
 
 <style>
-.container { padding: 20rpx; background: #f5f7fa; min-height: 100vh; }
-.wallet-card { background: linear-gradient(135deg, #e43d33 0%, #ff7a66 100%); border-radius: 16rpx; padding: 50rpx; color: #fff; text-align: center; box-shadow: 0 4rpx 12rpx rgba(228,61,51,0.3); }
-.title { font-size: 28rpx; opacity: 0.9; display: block; margin-bottom: 20rpx; }
-.balance { font-size: 72rpx; font-weight: bold; display: block; margin-bottom: 40rpx; }
-.recharge-btn { background: #fff; color: #e43d33; font-weight: bold; border-radius: 40rpx; font-size: 28rpx; width: 240rpx; height: 80rpx; line-height: 80rpx; margin: 0 auto; }
-.section-title { font-size: 32rpx; font-weight: bold; color: #333; margin: 40rpx 0 20rpx; padding-left: 10rpx; }
-.tx-list { background: #fff; border-radius: 16rpx; overflow: hidden; }
-.tx-item { padding: 30rpx; border-bottom: 1px solid #f5f5f5; display: flex; justify-content: space-between; align-items: center; }
-.left { display: flex; flex-direction: column; }
-.type { font-size: 30rpx; color: #333; margin-bottom: 8rpx; }
-.time { font-size: 24rpx; color: #999; }
-.right { font-size: 36rpx; font-weight: bold; }
-.plus { color: #67c23a; }
-.minus { color: #f56c6c; }
-.empty { text-align: center; padding: 50rpx; color: #999; font-size: 28rpx; }
+.wallet-hero {
+  padding: 28rpx;
+  margin-bottom: 22rpx;
+}
+
+.wallet-hero .col {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+.balance {
+  font-size: 48rpx;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.hint {
+  margin-top: 18rpx;
+  padding-top: 18rpx;
+  border-top: 1px solid var(--hairline);
+  font-size: 24rpx;
+  color: var(--muted);
+}
+
+.section {
+  margin-top: 10rpx;
+}
+
+.section-head {
+  margin: 10rpx 0 16rpx;
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.section-sub {
+  font-size: 24rpx;
+  color: var(--muted);
+}
+
+.list {
+  overflow: hidden;
+}
+
+.tx-item {
+  padding: 22rpx 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.tx-item:last-child {
+  border-bottom: none;
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.type {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.time {
+  font-size: 22rpx;
+  color: var(--muted);
+}
+
+.amount {
+  font-size: 30rpx;
+  font-weight: 800;
+}
+
+.plus {
+  color: #00c853;
+}
+
+.minus {
+  color: var(--text);
+  opacity: 0.9;
+}
+
+.empty {
+  padding: 90rpx 32rpx;
+  text-align: center;
+}
+
+.empty-title {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 10rpx;
+}
+
+.empty-sub {
+  display: block;
+  font-size: 24rpx;
+  color: var(--muted);
+}
 </style>

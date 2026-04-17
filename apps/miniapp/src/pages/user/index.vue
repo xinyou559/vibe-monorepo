@@ -1,36 +1,50 @@
 <template>
-  <view class="container">
-    <view class="user-card" v-if="user">
-      <view class="avatar">
-        <text class="avatar-text">{{ user.phone ? user.phone.slice(-4) : 'User' }}</text>
+  <view class="page">
+    <view v-if="user" class="surface profile">
+      <view class="row">
+        <view class="identity">
+          <text class="name">账户</text>
+          <text class="sub mono">UID #{{ String(user.id).padStart(4, '0') }}</text>
+        </view>
+        <view class="balance">
+          <text class="label">余额</text>
+          <text class="value mono">¥{{ Number(user.balance).toFixed(2) }}</text>
+        </view>
       </view>
-      <view class="user-info">
-        <text class="phone">{{ user.phone || '未绑定手机号' }}</text>
-        <text class="id-text">ID: {{ user.id }}</text>
-      </view>
-    </view>
-    <view class="user-card not-login" v-else @click="goToLogin">
-      <view class="avatar"><text class="avatar-text">?</text></view>
-      <view class="user-info">
-        <text class="phone">点击登录/注册</text>
+      <view class="meta">
+        <text class="meta-item">{{ user.phone || '未绑定手机号' }}</text>
       </view>
     </view>
 
-    <view class="menu-list" v-if="user">
-      <view class="menu-item" @click="goToWallet">
-        <text class="menu-title">我的钱包</text>
-        <text class="menu-desc">余额: ¥{{ user.balance }} ></text>
+    <view v-else class="surface profile" @click="goToLogin">
+      <view class="row">
+        <view class="identity">
+          <text class="name">未登录</text>
+          <text class="sub">点击登录 / 注册</text>
+        </view>
+        <button class="btn btn-primary">登录</button>
       </view>
-      <view class="menu-item" @click="goToOrders">
-        <text class="menu-title">我的订单</text>
-        <text class="menu-desc">></text>
+    </view>
+
+    <view class="surface actions" v-if="user">
+      <view class="action-row" @click="goToWallet">
+        <text class="left">我的钱包</text>
+        <text class="right mono">¥{{ Number(user.balance).toFixed(2) }}</text>
       </view>
-      <button class="menu-item share-btn" open-type="share">
-        <text class="menu-title">分享拉新客（赚提成）</text>
-        <text class="menu-desc">></text>
+      <view class="action-row" @click="goToOrders">
+        <text class="left">我的订单</text>
+        <text class="right">查看</text>
+      </view>
+      <button class="action-row share" open-type="share">
+        <text class="left">分享拉新客</text>
+        <text class="right">赚提成</text>
       </button>
-      <view class="menu-item" @click="logout">
-        <text class="menu-title" style="color: #f56c6c;">退出登录</text>
+    </view>
+
+    <view class="surface danger" v-if="user">
+      <view class="action-row" @click="logout">
+        <text class="left">退出登录</text>
+        <text class="right">注销</text>
       </view>
     </view>
   </view>
@@ -89,19 +103,102 @@ onShareAppMessage(() => {
 </script>
 
 <style>
-.container { padding: 20rpx; background: #f5f7fa; min-height: 100vh; }
-.user-card { background: #409eff; padding: 40rpx; border-radius: 16rpx; display: flex; align-items: center; margin-bottom: 30rpx; color: #fff; }
-.not-login { background: #909399; }
-.avatar { width: 100rpx; height: 100rpx; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 30rpx; }
-.avatar-text { font-size: 32rpx; font-weight: bold; }
-.user-info { display: flex; flex-direction: column; }
-.phone { font-size: 36rpx; font-weight: bold; margin-bottom: 10rpx; }
-.id-text { font-size: 24rpx; opacity: 0.8; }
-.menu-list { background: #fff; border-radius: 16rpx; overflow: hidden; }
-.menu-item { padding: 30rpx; border-bottom: 1px solid #f5f5f5; display: flex; justify-content: space-between; align-items: center; }
-.menu-item:last-child { border-bottom: none; }
-.menu-title { font-size: 30rpx; color: #333; }
-.menu-desc { font-size: 26rpx; color: #999; }
-.share-btn { background: #fff; border-radius: 0; text-align: left; line-height: inherit; display: flex; flex-direction: row; }
-.share-btn::after { border: none; }
+.profile {
+  padding: 28rpx;
+  margin-bottom: 20rpx;
+}
+
+.identity {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.name {
+  font-size: 34rpx;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.sub {
+  font-size: 24rpx;
+  color: var(--muted);
+}
+
+.balance {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8rpx;
+}
+
+.balance .label {
+  font-size: 22rpx;
+  color: var(--muted);
+}
+
+.balance .value {
+  font-size: 34rpx;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.meta {
+  margin-top: 18rpx;
+  padding-top: 18rpx;
+  border-top: 1px solid var(--hairline);
+}
+
+.meta-item {
+  font-size: 24rpx;
+  color: var(--muted);
+}
+
+.actions {
+  overflow: hidden;
+  margin-bottom: 20rpx;
+}
+
+.action-row {
+  padding: 24rpx 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--hairline);
+  background: transparent;
+  text-align: left;
+  line-height: 1;
+}
+
+.action-row::after {
+  border: none;
+}
+
+.action-row:last-child {
+  border-bottom: none;
+}
+
+.action-row .left {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.action-row .right {
+  font-size: 24rpx;
+  color: var(--muted);
+}
+
+.action-row.share {
+  border-radius: 0;
+}
+
+.danger {
+  overflow: hidden;
+  border-color: rgba(228, 61, 51, 0.18);
+}
+
+.danger .action-row .left {
+  color: var(--danger);
+}
 </style>
