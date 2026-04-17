@@ -1,46 +1,55 @@
 <template>
-  <div class="page-container">
-    <div class="header">
-      <h2>订单管理</h2>
-      <button @click="fetchOrders">刷新</button>
+  <div class="page-view">
+    <div class="page-header">
+      <h3>订单核销</h3>
+      <button class="action-btn" @click="fetchOrders">
+        ⟳ 刷新数据
+      </button>
     </div>
 
-    <div class="table-container">
-      <table>
+    <div class="data-table-wrapper">
+      <table class="data-table">
         <thead>
           <tr>
-            <th>订单号</th>
-            <th>用户ID</th>
-            <th>服务ID</th>
-            <th>支付金额</th>
-            <th>状态</th>
-            <th>下单时间</th>
-            <th>操作</th>
+            <th width="100">订单号</th>
+            <th width="100">用户 ID</th>
+            <th width="100">服务 ID</th>
+            <th width="140">实付金额</th>
+            <th width="140">订单状态</th>
+            <th width="180">下单时间</th>
+            <th width="120">操作</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="item in orders" :key="item.id">
-            <td>{{ item.id }}</td>
-            <td>{{ item.userId }}</td>
-            <td>{{ item.serviceId }}</td>
-            <td>¥{{ item.amount }}</td>
+            <td class="cell-id">#{{ String(item.id).padStart(6, '0') }}</td>
+            <td class="cell-ref">{{ item.userId }}</td>
+            <td class="cell-ref">{{ item.serviceId }}</td>
+            <td class="cell-price">¥{{ Number(item.amount).toFixed(2) }}</td>
             <td>
-              <span :class="['status', item.status.toLowerCase()]">
+              <div class="status-badge" :class="item.status.toLowerCase()">
+                <span class="dot"></span>
                 {{ formatStatus(item.status) }}
-              </span>
+              </div>
             </td>
-            <td>{{ new Date(item.createdAt).toLocaleString() }}</td>
+            <td class="cell-time">{{ new Date(item.createdAt).toLocaleString() }}</td>
             <td>
               <button 
-                class="btn-text" 
+                class="action-btn primary" 
                 v-if="item.status === 'PAID'" 
                 @click="completeOrder(item.id)">
                 核销完成
               </button>
+              <span v-else class="action-placeholder">-</span>
             </td>
           </tr>
           <tr v-if="orders.length === 0">
-            <td colspan="7" class="empty">暂无数据</td>
+            <td colspan="7" class="empty-state">
+              <div class="empty-content">
+                <span class="empty-icon">○</span>
+                <p>暂无订单记录</p>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -67,7 +76,6 @@ const completeOrder = async (id: number) => {
   if (!confirm('确认该服务已核销完成？')) return
   try {
     await adminApi.completeOrder(id)
-    alert('操作成功')
     fetchOrders()
   } catch (error) {
     alert('操作失败')
@@ -77,7 +85,7 @@ const completeOrder = async (id: number) => {
 const formatStatus = (status: string) => {
   const map: Record<string, string> = {
     INIT: '待支付',
-    PAID: '已支付/待服务',
+    PAID: '待核销',
     COMPLETED: '已完成',
     CANCELLED: '已取消'
   }
@@ -89,15 +97,99 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
-.page-container { padding: 20px; background: #fff; border-radius: 8px; }
-.header { display: flex; justify-content: space-between; margin-bottom: 20px; }
-table { width: 100%; border-collapse: collapse; }
-th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-.status.init { color: #909399; }
-.status.paid { color: #e6a23c; }
-.status.completed { color: #67c23a; }
-.status.cancelled { color: #f56c6c; }
-.btn-text { background: none; border: none; color: #409eff; cursor: pointer; }
-.empty { text-align: center; color: #909399; }
+<style scoped lang="scss">
+.data-table-wrapper {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.cell-id {
+  font-family: monospace;
+  font-weight: 500;
+}
+
+.cell-ref {
+  color: var(--text-secondary);
+}
+
+.cell-price {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.cell-time {
+  color: var(--text-tertiary);
+  font-size: 13px;
+}
+
+.action-placeholder {
+  color: var(--text-tertiary);
+  font-size: 14px;
+  padding-left: 12px;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+  
+  &.init {
+    background: #F5F5F5;
+    color: var(--text-secondary);
+    .dot { background: var(--text-tertiary); }
+  }
+  
+  &.paid {
+    background: rgba(230, 162, 60, 0.1);
+    color: #e6a23c;
+    .dot { background: #e6a23c; }
+  }
+  
+  &.completed {
+    background: rgba(0, 200, 83, 0.1);
+    color: #00C853;
+    .dot { background: #00C853; }
+  }
+  
+  &.cancelled {
+    background: rgba(245, 108, 108, 0.1);
+    color: #f56c6c;
+    .dot { background: #f56c6c; }
+  }
+}
+
+.empty-state {
+  padding: 80px 0;
+  
+  .empty-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-tertiary);
+    
+    .empty-icon {
+      font-size: 32px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    
+    p {
+      margin: 0;
+      font-size: 14px;
+    }
+  }
+}
 </style>

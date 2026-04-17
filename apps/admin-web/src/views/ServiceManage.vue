@@ -1,75 +1,103 @@
 <template>
-  <div class="page-container">
-    <div class="header">
-      <h2>服务管理</h2>
-      <button @click="showCreateModal = true">添加服务</button>
+  <div class="page-view">
+    <div class="page-header">
+      <h3>服务项目库</h3>
+      <button class="action-btn primary" @click="showCreateModal = true">
+        + 新增服务
+      </button>
     </div>
 
-    <div class="table-container">
-      <table>
+    <div class="data-table-wrapper">
+      <table class="data-table">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>服务名称</th>
-            <th>价格</th>
-            <th>提成比例</th>
-            <th>状态</th>
-            <th>创建时间</th>
-            <th>操作</th>
+            <th width="80">ID</th>
+            <th width="240">服务名称</th>
+            <th width="120">单价</th>
+            <th width="120">分销提成</th>
+            <th width="120">状态</th>
+            <th width="180">上架时间</th>
+            <th width="100">操作</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="item in services" :key="item.id">
-            <td>{{ item.id }}</td>
-            <td>{{ item.name }}</td>
-            <td>¥{{ item.price }}</td>
-            <td>{{ item.commissionRate * 100 }}%</td>
-            <td>
-              <span :class="['status', item.status.toLowerCase()]">
-                {{ item.status === 'ACTIVE' ? '上架中' : '已下架' }}
-              </span>
+            <td class="cell-id">#{{ String(item.id).padStart(4, '0') }}</td>
+            <td class="cell-name">
+              <span class="name">{{ item.name }}</span>
             </td>
-            <td>{{ new Date(item.createdAt).toLocaleString() }}</td>
+            <td class="cell-price">¥{{ Number(item.price).toFixed(2) }}</td>
+            <td class="cell-rate">{{ Number(item.commissionRate) * 100 }}%</td>
             <td>
-              <button class="btn-text" @click="editService(item)">编辑</button>
+              <span :class="['status-dot', item.status.toLowerCase()]"></span>
+              <span class="status-text">{{ item.status === 'ACTIVE' ? '营业中' : '已下架' }}</span>
+            </td>
+            <td class="cell-time">{{ new Date(item.createdAt).toLocaleDateString() }}</td>
+            <td>
+              <button class="action-btn" @click="editService(item)">配置</button>
             </td>
           </tr>
           <tr v-if="services.length === 0">
-            <td colspan="7" class="empty">暂无数据</td>
+            <td colspan="7" class="empty-state">
+              <div class="empty-content">
+                <span class="empty-icon">✧</span>
+                <p>暂无服务项目</p>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- 添加/编辑弹窗 -->
-    <div class="modal" v-if="showCreateModal">
-      <div class="modal-content">
-        <h3>{{ currentForm.id ? '编辑服务' : '添加服务' }}</h3>
-        <div class="form-group">
-          <label>服务名称</label>
-          <input v-model="currentForm.name" type="text" placeholder="如：精油开背">
-        </div>
-        <div class="form-group">
-          <label>服务价格</label>
-          <input v-model.number="currentForm.price" type="number" placeholder="金额（元）">
-        </div>
-        <div class="form-group">
-          <label>提成比例</label>
-          <input v-model.number="currentForm.commissionRate" type="number" step="0.01" placeholder="如：0.1 表示 10%">
-        </div>
-        <div class="form-group">
-          <label>状态</label>
-          <select v-model="currentForm.status">
-            <option value="ACTIVE">上架中</option>
-            <option value="INACTIVE">已下架</option>
-          </select>
-        </div>
-        <div class="modal-actions">
-          <button class="btn-cancel" @click="closeModal">取消</button>
-          <button class="btn-confirm" @click="saveService">确定</button>
+    <!-- 侧边抽屉弹窗 (替代居中 Modal，更具应用感) -->
+    <transition name="drawer">
+      <div class="drawer-overlay" v-if="showCreateModal" @click.self="closeModal">
+        <div class="drawer-content">
+          <div class="drawer-header">
+            <h4>{{ currentForm.id ? '配置服务项目' : '新建服务项目' }}</h4>
+            <button class="close-btn" @click="closeModal">×</button>
+          </div>
+          
+          <div class="drawer-body">
+            <div class="form-item">
+              <label>服务名称</label>
+              <input v-model="currentForm.name" type="text" placeholder="例如：精油开背 60min">
+            </div>
+            
+            <div class="form-row">
+              <div class="form-item">
+                <label>门市单价 (¥)</label>
+                <input v-model.number="currentForm.price" type="number" placeholder="0.00">
+              </div>
+              <div class="form-item">
+                <label>分销提成比例</label>
+                <input v-model.number="currentForm.commissionRate" type="number" step="0.01" placeholder="例如：0.10">
+                <span class="hint">0.10 即表示新客消费后，推荐人可得 10% 提成</span>
+              </div>
+            </div>
+
+            <div class="form-item">
+              <label>上架状态</label>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input type="radio" v-model="currentForm.status" value="ACTIVE">
+                  <span class="radio-text">营业中</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" v-model="currentForm.status" value="INACTIVE">
+                  <span class="radio-text">已下架</span>
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <div class="drawer-footer">
+            <button class="action-btn" @click="closeModal">取消</button>
+            <button class="action-btn primary" @click="saveService">保存配置</button>
+          </div>
         </div>
       </div>
-    </div>
+    </transition>
   </div>
 </template>
 
@@ -102,12 +130,14 @@ const editService = (item: ServiceItem) => {
 
 const closeModal = () => {
   showCreateModal.value = false
-  currentForm.value = {
-    name: '',
-    price: 0,
-    commissionRate: 0.1,
-    status: 'ACTIVE'
-  }
+  setTimeout(() => {
+    currentForm.value = {
+      name: '',
+      price: 0,
+      commissionRate: 0.1,
+      status: 'ACTIVE'
+    }
+  }, 300) // 等待动画结束
 }
 
 const saveService = async () => {
@@ -129,21 +159,216 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
-/* 这里暂放些简易样式 */
-.page-container { padding: 20px; background: #fff; border-radius: 8px; }
-.header { display: flex; justify-content: space-between; margin-bottom: 20px; }
-table { width: 100%; border-collapse: collapse; }
-th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-.status.active { color: #67c23a; }
-.status.inactive { color: #f56c6c; }
-.btn-text { background: none; border: none; color: #409eff; cursor: pointer; }
-.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; }
-.modal-content { background: white; padding: 24px; border-radius: 8px; width: 400px; }
-.form-group { margin-bottom: 15px; }
-.form-group label { display: block; margin-bottom: 5px; color: #606266; }
-.form-group input, .form-group select { width: 100%; padding: 8px; border: 1px solid #dcdfe6; border-radius: 4px; }
-.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-.btn-confirm { background: #409eff; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
-.btn-cancel { background: #fff; border: 1px solid #dcdfe6; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
+<style scoped lang="scss">
+.data-table-wrapper {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.cell-id {
+  font-family: monospace;
+  color: var(--text-tertiary);
+}
+
+.cell-name {
+  .name {
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+}
+
+.cell-price {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.cell-rate {
+  color: var(--text-secondary);
+}
+
+.cell-time {
+  color: var(--text-tertiary);
+  font-size: 13px;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 8px;
+  
+  &.active { background-color: #00C853; }
+  &.inactive { background-color: var(--text-tertiary); }
+}
+
+.status-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.empty-state {
+  padding: 80px 0;
+  
+  .empty-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-tertiary);
+    
+    .empty-icon {
+      font-size: 32px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    
+    p {
+      margin: 0;
+      font-size: 14px;
+    }
+  }
+}
+
+/* Drawer Component */
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 100;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.drawer-content {
+  width: 480px;
+  background: var(--bg-surface);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -4px 0 24px rgba(0,0,0,0.1);
+}
+
+.drawer-header {
+  padding: 24px 32px;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  h4 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    line-height: 1;
+    
+    &:hover {
+      color: var(--text-primary);
+    }
+  }
+}
+
+.drawer-body {
+  flex: 1;
+  padding: 32px;
+  overflow-y: auto;
+}
+
+.drawer-footer {
+  padding: 24px 32px;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.form-item {
+  margin-bottom: 24px;
+  
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+  
+  input[type="text"],
+  input[type="number"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+    
+    &:focus {
+      border-color: var(--text-primary);
+    }
+  }
+  
+  .hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--text-tertiary);
+  }
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  
+  .form-item {
+    flex: 1;
+  }
+}
+
+.radio-group {
+  display: flex;
+  gap: 24px;
+  margin-top: 12px;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  
+  .radio-text {
+    font-size: 14px;
+    color: var(--text-primary);
+  }
+}
+
+/* Drawer Transition */
+.drawer-enter-active,
+.drawer-leave-active {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  
+  .drawer-content {
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+.drawer-enter-from,
+.drawer-leave-to {
+  opacity: 0;
+  
+  .drawer-content {
+    transform: translateX(100%);
+  }
+}
 </style>

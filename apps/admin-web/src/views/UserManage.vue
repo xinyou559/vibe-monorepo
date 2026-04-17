@@ -1,68 +1,100 @@
 <template>
-  <div class="page-container">
-    <div class="header">
-      <h2>用户与分销管理</h2>
-      <button @click="fetchData">刷新</button>
+  <div class="page-view">
+    <div class="page-header">
+      <h3>用户与分销资产</h3>
+      <button class="action-btn" @click="fetchData">
+        ⟳ 刷新数据
+      </button>
     </div>
 
-    <div class="table-container">
-      <h3>用户列表</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>OpenID</th>
-            <th>手机号</th>
-            <th>当前余额</th>
-            <th>推荐人ID</th>
-            <th>注册时间</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="item in users" :key="item.id">
-            <td>{{ item.id }}</td>
-            <td>{{ item.openid }}</td>
-            <td>{{ item.phone || '-' }}</td>
-            <td>¥{{ item.balance }}</td>
-            <td>{{ item.referrerId || '无' }}</td>
-            <td>{{ new Date(item.createdAt).toLocaleString() }}</td>
-          </tr>
-          <tr v-if="users.length === 0">
-            <td colspan="6" class="empty">暂无用户</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <div class="split-view">
+      <!-- 用户资产列表 -->
+      <div class="panel">
+        <div class="panel-header">
+          <h4>用户账户资产</h4>
+          <span class="badge">{{ users.length }} 个用户</span>
+        </div>
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th width="80">UID</th>
+                <th>手机号 / OpenID</th>
+                <th width="120">当前余额</th>
+                <th width="100">推荐人</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in users" :key="item.id">
+                <td class="cell-id">#{{ String(item.id).padStart(4, '0') }}</td>
+                <td>
+                  <div class="user-identity">
+                    <span class="phone">{{ item.phone || '未绑定手机' }}</span>
+                    <span class="openid" :title="item.openid">{{ truncateOpenId(item.openid) }}</span>
+                  </div>
+                </td>
+                <td class="cell-price">¥{{ Number(item.balance).toFixed(2) }}</td>
+                <td class="cell-ref">
+                  <span v-if="item.referrerId" class="has-ref">#{{ String(item.referrerId).padStart(4, '0') }}</span>
+                  <span v-else class="no-ref">-</span>
+                </td>
+              </tr>
+              <tr v-if="users.length === 0">
+                <td colspan="4" class="empty-state">
+                  <div class="empty-content">
+                    <span class="empty-icon">❖</span>
+                    <p>暂无用户数据</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-    <div class="table-container" style="margin-top: 40px;">
-      <h3>全站资金流水 (充值/消费/提成)</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>流水号</th>
-            <th>用户ID</th>
-            <th>变动金额</th>
-            <th>类型</th>
-            <th>关联单号</th>
-            <th>发生时间</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="item in transactions" :key="item.id">
-            <td>{{ item.id }}</td>
-            <td>{{ item.userId }}</td>
-            <td :class="{ positive: item.amount > 0, negative: item.amount < 0 }">
-              {{ item.amount > 0 ? '+' : '' }}{{ item.amount }}
-            </td>
-            <td>{{ formatType(item.type) }}</td>
-            <td>{{ item.relatedId || '-' }}</td>
-            <td>{{ new Date(item.createdAt).toLocaleString() }}</td>
-          </tr>
-          <tr v-if="transactions.length === 0">
-            <td colspan="6" class="empty">暂无流水</td>
-          </tr>
-        </tbody>
-      </table>
+      <!-- 全局资金流水 -->
+      <div class="panel">
+        <div class="panel-header">
+          <h4>全局资金流水</h4>
+          <span class="badge">{{ transactions.length }} 笔记录</span>
+        </div>
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th width="80">UID</th>
+                <th width="140">发生时间</th>
+                <th width="100">变动类型</th>
+                <th width="120">发生额</th>
+                <th>关联单号</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in transactions" :key="item.id">
+                <td class="cell-id">#{{ String(item.userId).padStart(4, '0') }}</td>
+                <td class="cell-time">{{ new Date(item.createdAt).toLocaleString() }}</td>
+                <td>
+                  <span class="tx-type">{{ formatType(item.type) }}</span>
+                </td>
+                <td class="cell-price">
+                  <span :class="item.amount > 0 ? 'plus' : 'minus'">
+                    {{ item.amount > 0 ? '+' : '' }}{{ Number(item.amount).toFixed(2) }}
+                  </span>
+                </td>
+                <td class="cell-ref">{{ item.relatedId ? `#${String(item.relatedId).padStart(6, '0')}` : '-' }}</td>
+              </tr>
+              <tr v-if="transactions.length === 0">
+                <td colspan="5" class="empty-state">
+                  <div class="empty-content">
+                    <span class="empty-icon">≈</span>
+                    <p>暂无资金流水</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -88,9 +120,15 @@ const fetchData = async () => {
   }
 }
 
+const truncateOpenId = (str: string) => {
+  if (!str) return ''
+  if (str.length <= 12) return str
+  return `${str.slice(0, 6)}...${str.slice(-4)}`
+}
+
 const formatType = (type: string) => {
   const map: Record<string, string> = {
-    RECHARGE: '用户充值',
+    RECHARGE: '账户充值',
     CONSUME: '服务消费',
     COMMISSION: '分销提成'
   }
@@ -102,13 +140,131 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
-.page-container { padding: 20px; background: #fff; border-radius: 8px; }
-.header { display: flex; justify-content: space-between; margin-bottom: 20px; }
-table { width: 100%; border-collapse: collapse; }
-th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-.positive { color: #67c23a; font-weight: bold; }
-.negative { color: #f56c6c; font-weight: bold; }
-.empty { text-align: center; color: #909399; }
-h3 { margin-bottom: 10px; color: #303133; font-size: 16px; }
+<style scoped lang="scss">
+.split-view {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  
+  h4 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  
+  .badge {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-light);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    color: var(--text-tertiary);
+    font-weight: 500;
+  }
+}
+
+.data-table-wrapper {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.cell-id {
+  font-family: monospace;
+  font-weight: 500;
+}
+
+.user-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  
+  .phone {
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+  
+  .openid {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    font-family: monospace;
+  }
+}
+
+.cell-price {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  
+  .plus { color: #00C853; }
+  .minus { color: var(--text-primary); }
+}
+
+.cell-ref {
+  color: var(--text-tertiary);
+  font-family: monospace;
+  font-size: 13px;
+  
+  .has-ref {
+    color: var(--accent-color);
+    background: rgba(0,0,0,0.04);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+}
+
+.cell-time {
+  color: var(--text-tertiary);
+  font-size: 13px;
+}
+
+.tx-type {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.empty-state {
+  padding: 80px 0;
+  
+  .empty-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-tertiary);
+    
+    .empty-icon {
+      font-size: 32px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    
+    p {
+      margin: 0;
+      font-size: 14px;
+    }
+  }
+}
+
+/* 响应式：屏幕较小时转为上下堆叠 */
+@media (max-width: 1200px) {
+  .split-view {
+    grid-template-columns: 1fr;
+  }
+}
 </style>
