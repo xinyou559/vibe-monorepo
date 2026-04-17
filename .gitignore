@@ -1,0 +1,17 @@
+.DS_Store
+
+node_modules/
+dist/
+.env
+.env.*
+
+unpackage/
+
+target/
+*.log
+
+.idea/
+*.iml
+.classpath
+.project
+.settings/
