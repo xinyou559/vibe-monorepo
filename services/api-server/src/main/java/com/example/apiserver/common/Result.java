@@ -1,38 +1,39 @@
 package com.example.apiserver.common;
 
+import lombok.Data;
+
+@Data
 public class Result<T> {
+    private int code;
+    private String message;
+    private T data;
 
-	private final int code;
-	private final String message;
-	private final T data;
+    public static <T> Result<T> success() {
+        Result<T> result = new Result<>();
+        result.setCode(ErrorCode.SUCCESS.getCode());
+        result.setMessage(ErrorCode.SUCCESS.getMessage());
+        return result;
+    }
 
-	private Result(int code, String message, T data) {
-		this.code = code;
-		this.message = message;
-		this.data = data;
-	}
+    public static <T> Result<T> success(T data) {
+        Result<T> result = new Result<>();
+        result.setCode(ErrorCode.SUCCESS.getCode());
+        result.setMessage(ErrorCode.SUCCESS.getMessage());
+        result.setData(data);
+        return result;
+    }
 
-	public static <T> Result<T> ok(T data) {
-		return new Result<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), data);
-	}
+    public static <T> Result<T> error(ErrorCode errorCode) {
+        Result<T> result = new Result<>();
+        result.setCode(errorCode.getCode());
+        result.setMessage(errorCode.getMessage());
+        return result;
+    }
 
-	public static <T> Result<T> fail(ErrorCode errorCode) {
-		return new Result<>(errorCode.getCode(), errorCode.getMessage(), null);
-	}
-
-	public static <T> Result<T> fail(ErrorCode errorCode, String message) {
-		return new Result<>(errorCode.getCode(), message, null);
-	}
-
-	public int getCode() {
-		return code;
-	}
-
-	public String getMessage() {
-		return message;
-	}
-
-	public T getData() {
-		return data;
-	}
+    public static <T> Result<T> error(int code, String message) {
+        Result<T> result = new Result<>();
+        result.setCode(code);
+        result.setMessage(message);
+        return result;
+    }
 }

@@ -1,23 +1,27 @@
 package com.example.apiserver.common;
 
+import lombok.Getter;
+
+@Getter
 public enum ErrorCode {
-	OK(0, "OK"),
-	PARAM_INVALID(10001, "参数不合法"),
-	INTERNAL_ERROR(20000, "系统异常");
+    SUCCESS(200, "Success"),
+    BAD_REQUEST(400, "Bad Request"),
+    UNAUTHORIZED(401, "Unauthorized"),
+    FORBIDDEN(403, "Forbidden"),
+    NOT_FOUND(404, "Not Found"),
+    INTERNAL_SERVER_ERROR(500, "Internal Server Error"),
+    
+    USER_NOT_FOUND(1001, "User not found"),
+    BALANCE_INSUFFICIENT(1002, "Balance insufficient"),
+    ORDER_STATUS_ERROR(1003, "Order status error"),
+    SERVICE_NOT_FOUND(1004, "Service not found"),
+    SERVICE_UNAVAILABLE(1005, "Service unavailable");
 
-	private final int code;
-	private final String message;
+    private final int code;
+    private final String message;
 
-	ErrorCode(int code, String message) {
-		this.code = code;
-		this.message = message;
-	}
-
-	public int getCode() {
-		return code;
-	}
-
-	public String getMessage() {
-		return message;
-	}
+    ErrorCode(int code, String message) {
+        this.code = code;
+        this.message = message;
+    }
 }
