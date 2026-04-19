@@ -75,27 +75,27 @@ const currentRouteName = computed(() => route.meta.title || 'Overview')
 :root {
   --bg-canvas: #F7F7F9;
   --bg-surface: #FFFFFF;
-  --bg-sidebar: #111111;
-  --bg-sidebar-hover: #222222;
+  --bg-sidebar: #1A1B26; /* 午夜蓝灰 */
+  --bg-sidebar-hover: #2A2C3D; /* 浅午夜蓝 */
   
   --text-primary: #111111;
   --text-secondary: #666666;
   --text-tertiary: #999999;
   --text-inverse: #FFFFFF;
-  --text-inverse-muted: #888888;
+  --text-inverse-muted: rgba(255, 255, 255, 0.6);
   
   --border-light: #EAEAEA;
-  --border-dark: #333333;
+  --border-dark: #2A2C3D;
   
-  --accent-color: #000000;
-  --accent-hover: #333333;
+  --accent-color: #FF6B4A; /* 活力珊瑚橙 */
+  --accent-hover: #E65A3D; /* 深珊瑚橙 */
   
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
   
   --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 12px rgba(255, 107, 74, 0.15); /* 橙色轻微发光 */
 }
 
 body {
@@ -149,12 +149,17 @@ body {
   font-weight: 500;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   color: var(--text-primary);
   
   &:hover {
-    border-color: var(--text-primary);
+    border-color: var(--accent-color);
+    color: var(--accent-color);
     background: var(--bg-surface);
+  }
+  
+  &:active {
+    transform: scale(0.98);
   }
   
   &.primary {
@@ -164,6 +169,14 @@ body {
     
     &:hover {
       background: var(--accent-hover);
+      border-color: var(--accent-hover);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
+    }
+    
+    &:active {
+      transform: scale(0.98) translateY(0);
+      box-shadow: none;
     }
   }
 }
@@ -209,14 +222,15 @@ body {
   .brand-logo {
     width: 32px;
     height: 32px;
-    background: var(--text-inverse);
-    color: var(--bg-sidebar);
+    background: var(--accent-color);
+    color: var(--text-inverse);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
     font-size: 18px;
     border-radius: var(--radius-sm);
+    box-shadow: 0 2px 8px rgba(255, 107, 74, 0.4);
   }
   
   .brand-title {
@@ -258,10 +272,12 @@ body {
   font-size: 14px;
   font-weight: 500;
   margin-bottom: 4px;
+  position: relative;
   
   .icon {
     font-size: 16px;
     opacity: 0.7;
+    transition: all 0.2s;
   }
   
   &:hover {
@@ -275,6 +291,18 @@ body {
     
     .icon {
       opacity: 1;
+      color: var(--accent-color);
+    }
+    
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 10%;
+      height: 80%;
+      width: 3px;
+      background-color: var(--accent-color);
+      border-radius: 0 4px 4px 0;
     }
   }
 }
@@ -341,19 +369,20 @@ body {
   }
   
   .status-badge {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: var(--text-secondary);
-    
-    .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #00C853;
-    }
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    box-shadow: 0 0 8px var(--accent-color);
   }
+}
 }
 
 .content-scroll-area {

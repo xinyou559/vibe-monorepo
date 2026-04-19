@@ -210,7 +210,7 @@ onMounted(() => {
   font-variant-numeric: tabular-nums;
   font-weight: 500;
   
-  .plus { color: #00C853; }
+  .plus { color: var(--accent-color); }
   .minus { color: var(--text-primary); }
 }
 

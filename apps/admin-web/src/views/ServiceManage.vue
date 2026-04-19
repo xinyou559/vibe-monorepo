@@ -200,7 +200,10 @@ onMounted(() => {
   border-radius: 50%;
   margin-right: 8px;
   
-  &.active { background-color: #00C853; }
+  &.active { 
+    background-color: var(--accent-color); 
+    box-shadow: 0 0 6px rgba(255, 107, 74, 0.4);
+  }
   &.inactive { background-color: var(--text-tertiary); }
 }
 
@@ -312,10 +315,11 @@ onMounted(() => {
     font-size: 14px;
     outline: none;
     box-sizing: border-box;
-    transition: border-color 0.2s;
+    transition: all 0.2s;
     
     &:focus {
-      border-color: var(--text-primary);
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 2px rgba(255, 107, 74, 0.1);
     }
   }
   
@@ -347,6 +351,10 @@ onMounted(() => {
   align-items: center;
   gap: 8px;
   cursor: pointer;
+  
+  input[type="radio"] {
+    accent-color: var(--accent-color);
+  }
   
   .radio-text {
     font-size: 14px;

@@ -152,15 +152,18 @@ onMounted(() => {
   }
   
   &.paid {
-    background: rgba(230, 162, 60, 0.1);
-    color: #e6a23c;
-    .dot { background: #e6a23c; }
+    background: rgba(255, 107, 74, 0.08);
+    color: var(--accent-color);
+    .dot { 
+      background: var(--accent-color); 
+      box-shadow: 0 0 6px rgba(255, 107, 74, 0.4);
+    }
   }
   
   &.completed {
-    background: rgba(0, 200, 83, 0.1);
-    color: #00C853;
-    .dot { background: #00C853; }
+    background: #F5F5F5;
+    color: var(--text-primary);
+    .dot { background: var(--text-primary); }
   }
   
   &.cancelled {
