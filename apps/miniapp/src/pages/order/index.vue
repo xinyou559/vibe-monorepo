@@ -1,29 +1,26 @@
 <template>
-  <view class="page">
-    <view class="hero">
-      <text class="title-xl">我的订单</text>
-      <text class="title-sm">已购买服务 · 状态可追踪</text>
+  <view class="page-container">
+    <view class="header">
+      <text class="text-title">我的订单</text>
     </view>
-
-    <view class="surface list">
-      <view class="order-item" v-for="item in orders" :key="item.id">
-        <view class="row top">
-          <text class="oid mono">#{{ String(item.id).padStart(6, '0') }}</text>
-          <view class="badge" :class="item.status.toLowerCase()">
-            <text class="dot"></text>
-            <text class="label">{{ formatStatus(item.status) }}</text>
-          </view>
+    
+    <view class="order-list">
+      <view class="surface-card order-item" v-for="item in orders" :key="item.id">
+        <view class="top">
+          <text class="order-no">订单号: {{ String(item.id).padStart(6, '0') }}</text>
+          <text :class="['status-badge', item.status.toLowerCase()]">{{ formatStatus(item.status) }}</text>
         </view>
-        <view class="row mid">
-          <text class="service">服务 ID {{ item.serviceId }}</text>
-          <text class="amount mono">¥{{ Number(item.amount).toFixed(2) }}</text>
+        <view class="middle">
+          <text class="service-id">服务ID: {{ item.serviceId }}</text>
+          <text class="text-accent price">¥{{ Number(item.amount).toFixed(2) }}</text>
         </view>
-        <view class="time">{{ new Date(item.createdAt).toLocaleString() }}</view>
+        <view class="bottom">
+          <text class="text-caption time">{{ new Date(item.createdAt).toLocaleString() }}</text>
+        </view>
       </view>
-
+      
       <view class="empty" v-if="orders.length === 0">
-        <text class="empty-title">暂无订单记录</text>
-        <text class="empty-sub">购买成功后会显示在这里</text>
+        <text class="text-caption">暂无订单记录</text>
       </view>
     </view>
   </view>
@@ -41,9 +38,6 @@ const userId = ref<number>(0)
 const fetchOrders = async () => {
   if (!userId.value) return
   try {
-    // 为 MVP 简单过滤：由于管理端有 findAll，这里其实需要带 userId 查询
-    // 由于后端未提供根据 userId 查 orders 的专门接口，这里暂用 admin 接口拉全量后前端过滤
-    // (仅为 MVP 演示闭环，实际需要新接口 /api/v1/users/{userId}/orders)
     const res = await request<Order[]>('/admin/orders', 'GET')
     orders.value = res.filter(o => o.userId === userId.value)
   } catch (error) {
@@ -54,7 +48,7 @@ const fetchOrders = async () => {
 const formatStatus = (status: string) => {
   const map: Record<string, string> = {
     INIT: '待支付',
-    PAID: '已支付/待服务',
+    PAID: '待核销',
     COMPLETED: '已完成',
     CANCELLED: '已取消'
   }
@@ -73,118 +67,21 @@ onShow(() => {
 })
 </script>
 
-<style>
-.hero {
-  padding: 24rpx 0 28rpx;
-}
+<style scoped>
+.header { margin-bottom: 40rpx; }
+.order-item { display: flex; flex-direction: column; padding: 32rpx; }
+.top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24rpx; border-bottom: 1px solid var(--border-light); padding-bottom: 24rpx; }
+.order-no { font-size: 26rpx; color: var(--text-secondary); font-family: monospace; }
 
-.list {
-  overflow: hidden;
-}
+.status-badge { font-size: 24rpx; font-weight: 600; padding: 4rpx 12rpx; border-radius: 4rpx; }
+.status-badge.init { background: var(--bg-canvas); color: var(--text-tertiary); }
+.status-badge.paid { background: rgba(255, 107, 74, 0.08); color: var(--accent-color); }
+.status-badge.completed { background: var(--bg-canvas); color: var(--text-primary); }
+.status-badge.cancelled { background: rgba(245, 108, 108, 0.08); color: #f56c6c; }
 
-.order-item {
-  padding: 26rpx 28rpx;
-  border-bottom: 1px solid var(--hairline);
-}
-
-.order-item:last-child {
-  border-bottom: none;
-}
-
-.top {
-  margin-bottom: 16rpx;
-}
-
-.oid {
-  font-size: 26rpx;
-  color: var(--muted);
-  font-weight: 700;
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 10rpx;
-  padding: 8rpx 14rpx;
-  border-radius: 999rpx;
-  border: 1px solid var(--hairline);
-  background: rgba(17, 17, 17, 0.02);
-}
-
-.badge .dot {
-  width: 10rpx;
-  height: 10rpx;
-  border-radius: 999rpx;
-  background: var(--muted);
-}
-
-.badge .label {
-  font-size: 24rpx;
-  color: var(--text);
-  font-weight: 700;
-}
-
-.badge.paid {
-  background: rgba(230, 162, 60, 0.08);
-  border-color: rgba(230, 162, 60, 0.18);
-}
-.badge.paid .dot {
-  background: #e6a23c;
-}
-
-.badge.completed {
-  background: rgba(0, 200, 83, 0.08);
-  border-color: rgba(0, 200, 83, 0.18);
-}
-.badge.completed .dot {
-  background: #00c853;
-}
-
-.badge.cancelled {
-  background: rgba(228, 61, 51, 0.08);
-  border-color: rgba(228, 61, 51, 0.18);
-}
-.badge.cancelled .dot {
-  background: var(--danger);
-}
-
-.mid {
-  margin-bottom: 12rpx;
-}
-
-.service {
-  font-size: 28rpx;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.amount {
-  font-size: 30rpx;
-  font-weight: 800;
-  color: var(--text);
-}
-
-.time {
-  font-size: 22rpx;
-  color: var(--muted);
-}
-
-.empty {
-  padding: 100rpx 32rpx;
-  text-align: center;
-}
-
-.empty-title {
-  display: block;
-  font-size: 30rpx;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 10rpx;
-}
-
-.empty-sub {
-  display: block;
-  font-size: 24rpx;
-  color: var(--muted);
-}
+.middle { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20rpx; }
+.service-id { font-size: 32rpx; color: var(--text-primary); font-weight: 500; }
+.price { font-size: 36rpx; font-variant-numeric: tabular-nums; }
+.bottom { text-align: right; }
+.empty { text-align: center; padding: 100rpx 0; }
 </style>

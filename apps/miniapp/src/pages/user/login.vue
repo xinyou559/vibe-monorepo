@@ -1,30 +1,27 @@
 <template>
-  <view class="page">
-    <view class="hero">
-      <text class="title-xl">登录 / 注册</text>
-      <text class="title-sm">MVP 模拟登录，用于快速跑通链路</text>
+  <view class="page-container">
+    <view class="header">
+      <text class="text-title">登录美业系统</text>
+      <text class="text-subtitle" style="margin-top: 16rpx; display: block;">体验完整的服务与分销</text>
     </view>
-
-    <view class="surface form">
-      <view class="field">
+    
+    <view class="form">
+      <view class="input-item">
         <text class="label">模拟 OpenID</text>
-        <input class="input" v-model="openid" placeholder="例如：user_001" />
+        <input class="input" v-model="openid" placeholder="输入唯一标识如 user123" />
       </view>
-
-      <view class="field">
-        <text class="label">手机号（选填）</text>
-        <input class="input" v-model="phone" placeholder="例如：13800000000" />
+      <view class="input-item">
+        <text class="label">手机号(选填)</text>
+        <input class="input" v-model="phone" placeholder="输入手机号" />
       </view>
-
-      <view class="field" v-if="referrerId">
+      <view class="input-item" v-if="referrerId">
         <text class="label">绑定推荐人</text>
         <view class="chip">
-          <text class="mono">UID #{{ String(referrerId).padStart(4, '0') }}</text>
-          <text class="muted">（不可修改）</text>
+          <text>ID: {{ referrerId }} (已锁定)</text>
         </view>
       </view>
 
-      <button class="btn btn-primary full" @click="handleLogin">继续</button>
+      <button class="btn-primary" @click="handleLogin" style="margin-top: 60rpx;">确认登录</button>
     </view>
   </view>
 </template>
@@ -63,7 +60,6 @@ const handleLogin = async () => {
 }
 
 onLoad(() => {
-  // 读取本地缓存的推荐人ID
   const localRefId = uni.getStorageSync('referrerId')
   if (localRefId) {
     referrerId.value = localRefId
@@ -71,55 +67,12 @@ onLoad(() => {
 })
 </script>
 
-<style>
-.hero {
-  padding: 24rpx 0 28rpx;
-}
-
-.form {
-  padding: 28rpx;
-  display: flex;
-  flex-direction: column;
-  gap: 22rpx;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 10rpx;
-}
-
-.label {
-  font-size: 24rpx;
-  color: var(--muted);
-  font-weight: 600;
-}
-
-.input {
-  padding: 20rpx 18rpx;
-  border: 1px solid var(--hairline);
-  border-radius: 14rpx;
-  background: #ffffff;
-  font-size: 30rpx;
-}
-
-.chip {
-  display: flex;
-  align-items: center;
-  gap: 10rpx;
-  padding: 18rpx 16rpx;
-  border: 1px solid var(--hairline);
-  border-radius: 14rpx;
-  background: rgba(17, 17, 17, 0.02);
-}
-
-.muted {
-  font-size: 24rpx;
-  color: var(--muted);
-}
-
-.full {
-  width: 100%;
-  margin-top: 8rpx;
-}
+<style scoped>
+.header { margin-bottom: 80rpx; padding-top: 40rpx; }
+.form { display: flex; flex-direction: column; }
+.input-item { margin-bottom: 48rpx; }
+.label { font-size: 26rpx; font-weight: 600; color: var(--text-secondary); margin-bottom: 16rpx; display: block; text-transform: uppercase; letter-spacing: 1rpx; }
+.input { border-bottom: 1px solid var(--border-light); padding: 20rpx 0; font-size: 32rpx; transition: border-color 0.3s; }
+.input:focus { border-color: var(--accent-color); }
+.chip { display: inline-flex; background: rgba(255, 107, 74, 0.08); color: var(--accent-color); padding: 12rpx 24rpx; border-radius: var(--radius-sm); font-size: 26rpx; font-weight: 500; font-variant-numeric: tabular-nums; }
 </style>

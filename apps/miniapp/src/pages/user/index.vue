@@ -1,50 +1,37 @@
 <template>
-  <view class="page">
-    <view v-if="user" class="surface profile">
-      <view class="row">
-        <view class="identity">
-          <text class="name">账户</text>
-          <text class="sub mono">UID #{{ String(user.id).padStart(4, '0') }}</text>
-        </view>
-        <view class="balance">
-          <text class="label">余额</text>
-          <text class="value mono">¥{{ Number(user.balance).toFixed(2) }}</text>
-        </view>
+  <view class="page-container">
+    <view class="user-hero" v-if="user">
+      <view class="avatar">
+        <text class="avatar-text">{{ user.phone ? user.phone.slice(-4) : 'User' }}</text>
       </view>
-      <view class="meta">
-        <text class="meta-item">{{ user.phone || '未绑定手机号' }}</text>
+      <view class="user-info">
+        <text class="phone">{{ user.phone || '未绑定手机号' }}</text>
+        <text class="id-text">ID: {{ user.id }}</text>
+      </view>
+    </view>
+    <view class="user-hero not-login" v-else @click="goToLogin">
+      <view class="avatar"><text class="avatar-text">?</text></view>
+      <view class="user-info">
+        <text class="phone">点击登录/注册</text>
+        <text class="id-text">体验完整功能</text>
       </view>
     </view>
 
-    <view v-else class="surface profile" @click="goToLogin">
-      <view class="row">
-        <view class="identity">
-          <text class="name">未登录</text>
-          <text class="sub">点击登录 / 注册</text>
-        </view>
-        <button class="btn btn-primary">登录</button>
+    <view class="menu-list" v-if="user">
+      <view class="surface-card menu-item" @click="goToWallet">
+        <text class="text-subtitle">我的钱包</text>
+        <text class="text-accent menu-value">¥{{ user.balance }}</text>
       </view>
-    </view>
-
-    <view class="surface actions" v-if="user">
-      <view class="action-row" @click="goToWallet">
-        <text class="left">我的钱包</text>
-        <text class="right mono">¥{{ Number(user.balance).toFixed(2) }}</text>
+      <view class="surface-card menu-item" @click="goToOrders">
+        <text class="text-subtitle">我的订单</text>
+        <text class="arrow">›</text>
       </view>
-      <view class="action-row" @click="goToOrders">
-        <text class="left">我的订单</text>
-        <text class="right">查看</text>
-      </view>
-      <button class="action-row share" open-type="share">
-        <text class="left">分享拉新客</text>
-        <text class="right">赚提成</text>
+      <button class="surface-card menu-item share-btn" open-type="share">
+        <text class="text-subtitle">分享拉新客 (赚提成)</text>
+        <text class="arrow">›</text>
       </button>
-    </view>
-
-    <view class="surface danger" v-if="user">
-      <view class="action-row" @click="logout">
-        <text class="left">退出登录</text>
-        <text class="right">注销</text>
+      <view class="surface-card menu-item" @click="logout">
+        <text class="text-subtitle text-danger">退出登录</text>
       </view>
     </view>
   </view>
@@ -102,103 +89,22 @@ onShareAppMessage(() => {
 })
 </script>
 
-<style>
-.profile {
-  padding: 28rpx;
-  margin-bottom: 20rpx;
-}
-
-.identity {
-  display: flex;
-  flex-direction: column;
-  gap: 8rpx;
-}
-
-.name {
-  font-size: 34rpx;
-  font-weight: 800;
-  color: var(--text);
-}
-
-.sub {
-  font-size: 24rpx;
-  color: var(--muted);
-}
-
-.balance {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8rpx;
-}
-
-.balance .label {
-  font-size: 22rpx;
-  color: var(--muted);
-}
-
-.balance .value {
-  font-size: 34rpx;
-  font-weight: 800;
-  color: var(--text);
-}
-
-.meta {
-  margin-top: 18rpx;
-  padding-top: 18rpx;
-  border-top: 1px solid var(--hairline);
-}
-
-.meta-item {
-  font-size: 24rpx;
-  color: var(--muted);
-}
-
-.actions {
-  overflow: hidden;
-  margin-bottom: 20rpx;
-}
-
-.action-row {
-  padding: 24rpx 28rpx;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid var(--hairline);
-  background: transparent;
-  text-align: left;
-  line-height: 1;
-}
-
-.action-row::after {
-  border: none;
-}
-
-.action-row:last-child {
-  border-bottom: none;
-}
-
-.action-row .left {
-  font-size: 28rpx;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.action-row .right {
-  font-size: 24rpx;
-  color: var(--muted);
-}
-
-.action-row.share {
-  border-radius: 0;
-}
-
-.danger {
-  overflow: hidden;
-  border-color: rgba(228, 61, 51, 0.18);
-}
-
-.danger .action-row .left {
-  color: var(--danger);
-}
+<style scoped>
+.user-hero { background: var(--bg-midnight); padding: 60rpx 40rpx; border-radius: var(--radius-lg); display: flex; align-items: center; margin-bottom: 40rpx; color: var(--text-inverse); box-shadow: 0 20rpx 40rpx rgba(26, 27, 38, 0.1); }
+.not-login { background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-light); box-shadow: none; }
+.not-login .avatar { background: var(--bg-canvas); color: var(--text-tertiary); }
+.not-login .id-text { color: var(--text-tertiary); }
+.avatar { width: 120rpx; height: 120rpx; background: var(--accent-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 32rpx; box-shadow: 0 8rpx 16rpx rgba(255, 107, 74, 0.3); }
+.avatar-text { font-size: 36rpx; font-weight: 700; color: var(--text-inverse); }
+.user-info { display: flex; flex-direction: column; }
+.phone { font-size: 40rpx; font-weight: 700; margin-bottom: 8rpx; letter-spacing: -0.5rpx; }
+.id-text { font-size: 26rpx; opacity: 0.6; font-variant-numeric: tabular-nums; }
+.menu-list { display: flex; flex-direction: column; gap: 16rpx; }
+.menu-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0; padding: 40rpx 32rpx; transition: transform 0.2s, background 0.2s; }
+.menu-item:active { transform: scale(0.98); background: #FAFAFA; }
+.menu-value { font-size: 32rpx; font-variant-numeric: tabular-nums; }
+.arrow { color: var(--text-tertiary); font-size: 40rpx; line-height: 1; }
+.share-btn { background: var(--bg-surface); text-align: left; line-height: 1.5; font-size: inherit; }
+.share-btn::after { border: none; }
+.text-danger { color: #E43D33; }
 </style>

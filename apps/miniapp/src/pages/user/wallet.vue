@@ -1,34 +1,30 @@
 <template>
-  <view class="page">
-    <view class="surface wallet-hero">
-      <view class="row">
-        <view class="col">
-          <text class="title-sm">当前余额</text>
-          <text class="balance mono">¥{{ Number(userBalance).toFixed(2) }}</text>
-        </view>
-        <button class="btn btn-primary" @click="handleRecharge">充值</button>
+  <view class="page-container">
+    <view class="wallet-hero">
+      <text class="wallet-label">当前余额</text>
+      <view class="balance-wrap">
+        <text class="currency">¥</text>
+        <text class="balance-num">{{ userBalance }}</text>
       </view>
-      <view class="hint">充值 / 消费 / 提成收入均会记录到流水</view>
+      <button class="recharge-btn" @click="handleRecharge">充值</button>
     </view>
 
-    <view class="section">
-      <view class="row section-head">
-        <text class="section-title">资金流水</text>
-        <text class="section-sub">{{ transactions.length }} 条</text>
+    <view class="tx-section">
+      <view class="tx-header">
+        <text class="text-subtitle">资金明细</text>
       </view>
-      <view class="surface list">
+      <view class="tx-list">
         <view class="tx-item" v-for="item in transactions" :key="item.id">
-          <view class="left">
-            <text class="type">{{ formatType(item.type) }}</text>
-            <text class="time">{{ new Date(item.createdAt).toLocaleString() }}</text>
+          <view class="tx-left">
+            <text class="tx-type">{{ formatType(item.type) }}</text>
+            <text class="tx-time">{{ new Date(item.createdAt).toLocaleString() }}</text>
           </view>
-          <view class="amount mono" :class="item.amount > 0 ? 'plus' : 'minus'">
+          <view :class="['tx-right', item.amount > 0 ? 'text-accent' : 'text-primary']">
             {{ item.amount > 0 ? '+' : '' }}{{ Number(item.amount).toFixed(2) }}
           </view>
         </view>
         <view class="empty" v-if="transactions.length === 0">
-          <text class="empty-title">暂无资金流水</text>
-          <text class="empty-sub">完成一次充值或购买后会显示在这里</text>
+          <text class="text-caption">暂无资金流水</text>
         </view>
       </view>
     </view>
@@ -51,7 +47,7 @@ const fetchWalletData = async () => {
   try {
     // 1. 获取最新余额
     const user = await request<User>(`/users/${userId.value}`, 'GET')
-    userBalance.value = user.balance.toString()
+    userBalance.value = Number(user.balance).toFixed(2)
     uni.setStorageSync('user', user)
 
     // 2. 获取流水
@@ -67,6 +63,7 @@ const handleRecharge = () => {
     title: '充值(MVP模拟)',
     editable: true,
     placeholderText: '请输入充值金额(元)',
+    confirmColor: '#FF6B4A',
     success: async (res) => {
       if (res.confirm && res.content) {
         const amount = Number(res.content)
@@ -109,114 +106,25 @@ onShow(() => {
 })
 </script>
 
-<style>
-.wallet-hero {
-  padding: 28rpx;
-  margin-bottom: 22rpx;
-}
+<style scoped>
+.wallet-hero { background: var(--bg-midnight); border-radius: var(--radius-lg); padding: 60rpx 40rpx; color: var(--text-inverse); display: flex; flex-direction: column; align-items: center; box-shadow: 0 20rpx 40rpx rgba(26, 27, 38, 0.15); margin-bottom: 48rpx; position: relative; overflow: hidden; }
+.wallet-hero::before { content: ''; position: absolute; top: -50%; right: -20%; width: 400rpx; height: 400rpx; background: radial-gradient(circle, rgba(255,107,74,0.15) 0%, transparent 70%); border-radius: 50%; pointer-events: none; }
+.wallet-label { font-size: 26rpx; opacity: 0.8; margin-bottom: 16rpx; letter-spacing: 2rpx; text-transform: uppercase; }
+.balance-wrap { display: flex; align-items: baseline; gap: 8rpx; margin-bottom: 48rpx; }
+.currency { font-size: 40rpx; font-weight: 600; color: var(--accent-color); }
+.balance-num { font-size: 88rpx; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -2rpx; line-height: 1; }
+.recharge-btn { background: var(--accent-color); color: var(--text-inverse); font-size: 28rpx; font-weight: 600; height: 72rpx; line-height: 72rpx; padding: 0 80rpx; border-radius: 36rpx; border: none; }
+.recharge-btn::after { border: none; }
+.recharge-btn:active { background: var(--accent-hover); transform: scale(0.96); }
 
-.wallet-hero .col {
-  display: flex;
-  flex-direction: column;
-  gap: 10rpx;
-}
-
-.balance {
-  font-size: 48rpx;
-  font-weight: 800;
-  color: var(--text);
-}
-
-.hint {
-  margin-top: 18rpx;
-  padding-top: 18rpx;
-  border-top: 1px solid var(--hairline);
-  font-size: 24rpx;
-  color: var(--muted);
-}
-
-.section {
-  margin-top: 10rpx;
-}
-
-.section-head {
-  margin: 10rpx 0 16rpx;
-}
-
-.section-title {
-  font-size: 28rpx;
-  font-weight: 800;
-  color: var(--text);
-}
-
-.section-sub {
-  font-size: 24rpx;
-  color: var(--muted);
-}
-
-.list {
-  overflow: hidden;
-}
-
-.tx-item {
-  padding: 22rpx 28rpx;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid var(--hairline);
-}
-
-.tx-item:last-child {
-  border-bottom: none;
-}
-
-.left {
-  display: flex;
-  flex-direction: column;
-  gap: 8rpx;
-}
-
-.type {
-  font-size: 28rpx;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.time {
-  font-size: 22rpx;
-  color: var(--muted);
-}
-
-.amount {
-  font-size: 30rpx;
-  font-weight: 800;
-}
-
-.plus {
-  color: #00c853;
-}
-
-.minus {
-  color: var(--text);
-  opacity: 0.9;
-}
-
-.empty {
-  padding: 90rpx 32rpx;
-  text-align: center;
-}
-
-.empty-title {
-  display: block;
-  font-size: 30rpx;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 10rpx;
-}
-
-.empty-sub {
-  display: block;
-  font-size: 24rpx;
-  color: var(--muted);
-}
+.tx-section { display: flex; flex-direction: column; }
+.tx-header { padding: 20rpx 0; margin-bottom: 16rpx; }
+.tx-list { background: var(--bg-surface); border-radius: var(--radius-md); border: 1px solid var(--border-light); }
+.tx-item { display: flex; justify-content: space-between; align-items: center; padding: 32rpx; border-bottom: 1px solid var(--border-light); }
+.tx-item:last-child { border-bottom: none; }
+.tx-left { display: flex; flex-direction: column; gap: 8rpx; }
+.tx-type { font-size: 30rpx; font-weight: 600; color: var(--text-primary); }
+.tx-time { font-size: 24rpx; color: var(--text-tertiary); }
+.tx-right { font-size: 32rpx; font-weight: 600; font-variant-numeric: tabular-nums; }
+.empty { text-align: center; padding: 80rpx 0; }
 </style>
